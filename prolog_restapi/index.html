@@ -9,16 +9,24 @@
 <body>
     <div class="container">
         <h1>Student Eligibility Checker</h1>
-        <div class="form-group">
-            <label for="student_id">Student ID:</label>
-            <input type="text" id="student_id" placeholder="Enter Student ID">
+        <div>
+            <label for="studentID">Enter Student ID:</label>
+            <input type="number" id="studentID" placeholder="e.g., 15" required>
+            <button onclick="checkEligibility()">Check</button>
         </div>
-        <div class="button-group">
-            <button class="btn" onclick="checkEligibility('scholarship')">Check Scholarship</button>
-            <button class="btn" onclick="checkEligibility('exam_permission')">Check Exam Permission</button>
-        </div>
-        <p id="result" class="result"></p>
     </div>
+
+    <!-- Modal -->
+    <div id="resultsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h3>Results</h3>
+            <p id="scholarshipStatus" class="status"></p>
+            <p id="examPermissionStatus" class="status"></p>
+            <button class="btn next-btn" onclick="closeModal()">Check Next</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

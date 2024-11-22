@@ -1,20 +1,46 @@
-async function checkEligibility(type) {
-    const studentId = document.getElementById("student_id").value;
-    if (!studentId) {
-        document.getElementById("result").textContent = "Please enter a Student ID.";
+async function checkEligibility() {
+    const studentID = document.getElementById('studentID').value;
+
+    if (!studentID) {
+        alert("Please enter a valid Student ID!");
         return;
     }
 
-    const endpoint = type === "scholarship" ? "/scholarship" : "/exam_permission";
     try {
-        const response = await fetch(`http://localhost:8000${endpoint}?student_id=${studentId}`);
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        document.getElementById("result").textContent = `Result: ${data.status}`;
+        // Fetch scholarship status
+        const scholarshipResponse = await fetch(`http://localhost:3000/check_scholarship?student_id=${studentID}`);
+        const scholarshipData = await scholarshipResponse.json();
+
+        // Fetch exam permission status
+        const examResponse = await fetch(`http://localhost:3000/check_exam_permission?student_id=${studentID}`);
+        const examData = await examResponse.json();
+
+        // Format statuses
+        const scholarshipStatusText = scholarshipData.status === "not_eligible" ? "Not Eligible" : "Eligible";
+        const scholarshipStatusClass = scholarshipData.status === "not_eligible" ? "negative" : "positive";
+
+        const examStatusText = examData.status === "not_permitted" ? "Not Permitted" : "Permitted";
+        const examStatusClass = examData.status === "not_permitted" ? "negative" : "positive";
+
+        // Display scholarship status
+        const scholarshipStatus = document.getElementById('scholarshipStatus');
+        scholarshipStatus.innerText = `Scholarship Eligibility: ${scholarshipStatusText}`;
+        scholarshipStatus.className = `status ${scholarshipStatusClass}`;
+
+        // Display exam permission status
+        const examPermissionStatus = document.getElementById('examPermissionStatus');
+        examPermissionStatus.innerText = `Exam Permission: ${examStatusText}`;
+        examPermissionStatus.className = `status ${examStatusClass}`;
+
+        // Open modal
+        document.getElementById('resultsModal').style.display = "flex";
     } catch (error) {
-        document.getElementById("result").textContent = "Error fetching data. Please try again.";
-        console.error("Error:", error);
+        console.error("Error fetching data:", error);
+        alert("Failed to fetch eligibility data. Please ensure the server is running.");
     }
+}
+
+function closeModal() {
+    document.getElementById('resultsModal').style.display = "none";
+    document.getElementById('studentID').value = ""; // Reset input for next check
 }

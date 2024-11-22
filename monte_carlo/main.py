@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Define conditional probabilities for the Bayesian Network
 P_A = {"yes": 0.8, "no": 0.2}
 P_C = {"yes": 0.5, "no": 0.5}
 P_G_given_A_C = {
@@ -24,25 +23,15 @@ def monte_carlo_simulation(target_query, evidence, num_samples=10000):
     count_evidence_satisfied = 0
 
     for _ in range(num_samples):
-        # Sample Aptitude Skills (A)
         aptitude = "yes" if np.random.rand() < P_A["yes"] else "no"
-
-        # Sample Coding Skills (C)
         coding = "yes" if np.random.rand() < P_C["yes"] else "no"
-
-        # Sample Grade (G) given A and C
         grade_probs = P_G_given_A_C[(aptitude, coding)]
         grade = "Good" if np.random.rand() < grade_probs["Good"] else "OK"
-
-        # Sample Go for Job (J) given Grade (G)
         job_probs = P_J_given_G[grade]
         job = "yes" if np.random.rand() < job_probs["yes"] else "no"
-
-        # Sample Start a Startup (S) given Grade (G)
         startup_probs = P_S_given_G[grade]
         startup = "yes" if np.random.rand() < startup_probs["yes"] else "no"
 
-        # Current state of the nodes
         node_states = {
             "A": aptitude,
             "C": coding,
@@ -51,10 +40,8 @@ def monte_carlo_simulation(target_query, evidence, num_samples=10000):
             "S": startup,
         }
 
-        # Check if evidence is satisfied
         if all(node_states[key] == value for key, value in evidence.items()):
             count_evidence_satisfied += 1
-            # Check if target query is true
             if node_states[target_query] == "yes":
                 count_target_true += 1
 
@@ -64,7 +51,7 @@ def monte_carlo_simulation(target_query, evidence, num_samples=10000):
     return count_target_true / count_evidence_satisfied
 
 def convergence_analysis(actual_value, evidence, target_query):
-    sample_sizes = np.logspace(2, 5, num=15, dtype=int)  # Logarithmic range of samples (100 to 100,000)
+    sample_sizes = np.logspace(2, 5, num=15, dtype=int) 
     results = []
 
     print(f"Actual Value: {actual_value:.3f}\n")
@@ -78,7 +65,6 @@ def convergence_analysis(actual_value, evidence, target_query):
         results.append((num_samples, estimated_value))
         print(f"With {num_samples} samples: P({target_query}=True | Evidence) ≈ {estimated_value:.3f}, Closeness: {closeness:.2f}%")
 
-    # Plot results
     x, y = zip(*results)
     plt.figure(figsize=(10, 6))
     plt.plot(x, y, marker="o", label="Estimated Probability")
@@ -93,7 +79,6 @@ def convergence_analysis(actual_value, evidence, target_query):
 
 # Example usage
 if __name__ == "__main__":
-    # Calculate the actual value for verification
     P_actual = (
         P_G_given_A_C[("yes", "yes")]["Good"] * P_S_given_G["Good"]["yes"]
         + P_G_given_A_C[("yes", "yes")]["OK"] * P_S_given_G["OK"]["yes"]
